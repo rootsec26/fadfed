@@ -9,8 +9,8 @@ const siteUrl = getSiteUrl();
 export const metadata: Metadata = {
   ...(siteUrl ? { metadataBase: new URL(siteUrl) } : {}),
   title: {
-    default: "عيادة سكينة للصحة النفسية | Sakeena Clinic",
-    template: "%s | عيادة سكينة",
+    default: "فضفض | Fadfed",
+    template: "%s | فضفض",
   },
   description:
     "جلسات علاج نفسي فردية وزوجية وللمراهقين، حضورياً وأونلاين، بخصوصية تامة. Confidential psychological therapy, in clinic or online.",

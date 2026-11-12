@@ -13,8 +13,8 @@ export const doctorProfile = {
   photoAltAr: "صورة د. أحمد يوسف",
   photoAltEn: "Photo of Dr. Ahmed Youssef",
 
-  clinicNameAr: "عيادة سكينة للصحة النفسية",
-  clinicNameEn: "Sakeena Mental Health Clinic",
+  clinicNameAr: "فضفض",
+  clinicNameEn: "Fadfed",
 
   // TODO: fill in real contact details — leave empty to hide them on the site.
   phone: "",
