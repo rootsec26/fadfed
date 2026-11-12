@@ -64,8 +64,8 @@ export const en: Dictionary = {
       secondary: "Explore services",
     },
     intro: {
-      title: "Welcome — you are not alone",
-      text: "Asking for help is a strength, not a weakness. I walk with you through clear, evidence-based steps so we can understand what you are going through and build practical tools to keep going.",
+      title: "Welcome, you're not alone.",
+      text: "Asking for help is not a weakness, it's a brave first step. I'll walk with you through clear steps so we can understand what you're going through and find tools together that help you keep going.",
       points: ["Full confidentiality", "Evidence-based therapy", "Flexible online or in-person sessions"],
     },
     services: {
