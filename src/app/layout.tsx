@@ -1,8 +1,17 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import { Cairo } from "next/font/google";
 import { getI18n } from "@/lib/i18n";
 import { getSiteUrl } from "@/lib/site";
 import "./globals.css";
+
+// Self-hosted via next/font — no render-blocking request to Google Fonts.
+const cairo = Cairo({
+  subsets: ["arabic", "latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-cairo",
+  display: "swap",
+});
 
 const siteUrl = getSiteUrl();
 
@@ -21,15 +30,7 @@ export const viewport: Viewport = { themeColor: "#2f6f6b", width: "device-width"
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const { lang, dir } = await getI18n();
   return (
-    <html lang={lang} dir={dir} data-scroll-behavior="smooth">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap"
-        />
-      </head>
+    <html lang={lang} dir={dir} data-scroll-behavior="smooth" className={cairo.variable}>
       <body className="min-h-screen antialiased">{children}</body>
     </html>
   );

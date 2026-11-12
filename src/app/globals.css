@@ -3,7 +3,7 @@
 /* Design tokens – single source of truth for the whole site.
    Palette: calm teal primary, sage, warm sand, soft terracotta accent. */
 @theme {
-  --font-sans: "Cairo", "Tajawal", system-ui, sans-serif;
+  --font-sans: var(--font-cairo), "Tajawal", system-ui, sans-serif;
 
   /* primary – calm teal green (#2F6F6B) */
   --color-brand-50: #eff6f4;
