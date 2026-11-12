@@ -1,5 +1,5 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -8,25 +8,31 @@ if (!databaseUrl) {
 }
 
 const globalForDb = globalThis as typeof globalThis & {
-  __arenaNextJsPostgresqlPool?: Pool;
+  __postgresClient?: postgres.Sql;
 };
 
-export const pool =
-  globalForDb.__arenaNextJsPostgresqlPool ??
-  new Pool({
-    connectionString: databaseUrl,
-    // Supabase's pooler drops idle TCP connections; without keepAlive the
-    // pool can hand out dead sockets and queries fail with "Connection
-    // closed". keepAlive + a connection timeout makes checkout fail fast
-    // and reconnect instead of hanging or erroring mid-request.
-    keepAlive: true,
-    keepAliveInitialDelayMillis: 10_000,
-    connectionTimeoutMillis: 10_000,
-    idleTimeoutMillis: 30_000,
+// postgres.js is used (instead of node-postgres) because Supabase's
+// Transaction Pooler (port 6543) requires `prepare: false` — prepared
+// statements are not supported in transaction mode. On Vercel each
+// serverless instance gets a single connection; locally we keep a small
+// pool and cache it on globalThis so `next dev` hot-reloads don't leak
+// connections.
+const isServerless = !!process.env.VERCEL || process.env.NODE_ENV === "production";
+
+export const sqlClient =
+  globalForDb.__postgresClient ??
+  postgres(databaseUrl, {
+    prepare: false,
+    max: isServerless ? 1 : 10,
+    idle_timeout: isServerless ? 20 : 60,
+    connect_timeout: 10,
+    // The pooler drops idle TCP connections; keepAlive avoids handing out
+    // dead sockets and makes checkout fail fast instead of hanging.
+    keep_alive: 60,
   });
 
 if (process.env.NODE_ENV !== "production") {
-  globalForDb.__arenaNextJsPostgresqlPool = pool;
+  globalForDb.__postgresClient = sqlClient;
 }
 
-export const db = drizzle(pool);
+export const db = drizzle(sqlClient);

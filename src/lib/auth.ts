@@ -56,13 +56,20 @@ export async function destroySession() {
 export const getCurrentUser = cache(async () => {
   const token = (await cookies()).get(COOKIE)?.value;
   if (!token) return null;
-  const [row] = await db
-    .select({ id: users.id, email: users.email, name: users.name, phone: users.phone, role: users.role })
-    .from(sessions)
-    .innerJoin(users, eq(users.id, sessions.userId))
-    .where(and(eq(sessions.id, sha(token)), gt(sessions.expiresAt, new Date())))
-    .limit(1);
-  return row ?? null;
+  try {
+    const [row] = await db
+      .select({ id: users.id, email: users.email, name: users.name, phone: users.phone, role: users.role })
+      .from(sessions)
+      .innerJoin(users, eq(users.id, sessions.userId))
+      .where(and(eq(sessions.id, sha(token)), gt(sessions.expiresAt, new Date())))
+      .limit(1);
+    return row ?? null;
+  } catch (err) {
+    // A failed session lookup must not take down public pages — the header
+    // calls this on every page. Protected routes still redirect to /login.
+    console.error("[auth] getCurrentUser failed:", err);
+    return null;
+  }
 });
 
 export type CurrentUser = NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>;

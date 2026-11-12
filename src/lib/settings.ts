@@ -45,18 +45,25 @@ export const DEFAULT_SETTINGS = {
  * DEFAULT_SETTINGS, and DEFAULT_SETTINGS itself is the last-resort fallback.
  */
 export const getSettings = cache(async () => {
-  await ensureSeed();
-  const [row] = await db.select().from(clinicSettings).where(eq(clinicSettings.id, 1)).limit(1);
-  if (row) return row;
+  try {
+    await ensureSeed();
+    const [row] = await db.select().from(clinicSettings).where(eq(clinicSettings.id, 1)).limit(1);
+    if (row) return row;
 
-  // Self-heal: create the singleton row so the app works even when the
-  // demo seed never ran (AUTO_SEED=false or a partial/failed seed).
-  await db
-    .insert(clinicSettings)
-    .values({ ...DEFAULT_SETTINGS })
-    .onConflictDoNothing({ target: clinicSettings.id });
-  const [created] = await db.select().from(clinicSettings).where(eq(clinicSettings.id, 1)).limit(1);
-  return created ?? { ...DEFAULT_SETTINGS };
+    // Self-heal: create the singleton row so the app works even when the
+    // demo seed never ran (AUTO_SEED=false or a partial/failed seed).
+    await db
+      .insert(clinicSettings)
+      .values({ ...DEFAULT_SETTINGS })
+      .onConflictDoNothing({ target: clinicSettings.id });
+    const [created] = await db.select().from(clinicSettings).where(eq(clinicSettings.id, 1)).limit(1);
+    return created ?? { ...DEFAULT_SETTINGS };
+  } catch (err) {
+    // Public pages render with defaults when the DB is unreachable instead
+    // of crashing; protected pages still fail at their own queries.
+    console.error("[settings] getSettings failed:", err);
+    return { ...DEFAULT_SETTINGS };
+  }
 });
 
 export type ClinicSettings = NonNullable<Awaited<ReturnType<typeof getSettings>>>;

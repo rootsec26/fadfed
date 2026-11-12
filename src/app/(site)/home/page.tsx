@@ -14,9 +14,15 @@ import { doctorProfile } from "@/lib/profile";
 
 export default async function HomePage() {
   const [{ t, lang }, settings] = await Promise.all([getI18n(), getSettings()]);
+  // Keep the page rendering (with empty sections) if the DB is unreachable.
+  const safe = <T,>(p: Promise<T[]>) =>
+    p.catch((err) => {
+      console.error("[home] query failed:", err);
+      return [] as T[];
+    });
   const [svc, reviews] = await Promise.all([
-    db.select().from(services).where(eq(services.active, true)).orderBy(asc(services.sortOrder)).limit(4),
-    db.select().from(testimonials).where(eq(testimonials.published, true)).orderBy(asc(testimonials.id)),
+    safe(db.select().from(services).where(eq(services.active, true)).orderBy(asc(services.sortOrder)).limit(4)),
+    safe(db.select().from(testimonials).where(eq(testimonials.published, true)).orderBy(asc(testimonials.id))),
   ]);
   const h = t.home;
   const currency = pick(lang, settings?.currencyAr ?? "ج.م", settings?.currencyEn ?? "EGP");
