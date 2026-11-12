@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { contactMessages } from "@/db/schema";
 import { sendEmail } from "@/lib/integrations/notify";
 import { getI18n } from "@/lib/i18n";
+import { clientKey, rateLimit } from "@/lib/rate-limit";
 import { getSettings } from "@/lib/settings";
 import { doctorProfile } from "@/lib/profile";
 
@@ -19,6 +20,10 @@ const schema = z.object({
 
 export async function sendContactMessage(_prev: ContactState, formData: FormData): Promise<ContactState> {
   const { t } = await getI18n();
+  // Spam guard: 10 messages / hour per IP.
+  if (!rateLimit(`contact:${await clientKey("contact")}`, 10, 60 * 60 * 1000)) {
+    return { error: t.contact.error };
+  }
   const parsed = schema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { error: t.contact.error };
 

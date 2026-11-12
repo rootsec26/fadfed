@@ -17,11 +17,16 @@ export async function setLanguage(formData: FormData) {
   (await cookies()).set(LANG_COOKIE, lang, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
 }
 
-/** Only allow same-site relative redirects. */
+/** Only allow same-site relative redirects (rejects "//host" and "/\host" tricks). */
 function safeNext(value: FormDataEntryValue | null) {
   const v = typeof value === "string" ? value : "";
-  return v.startsWith("/") && !v.startsWith("//") ? v : null;
+  return v.startsWith("/") && !v.startsWith("//") && !v.includes("\\") ? v : null;
 }
+
+// Burn one scrypt verification for unknown emails so login response times
+// don't reveal whether an account exists (user enumeration via timing).
+const DUMMY_HASH =
+  "00000000000000000000000000000000:00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 
 export async function login(_prev: AuthState, formData: FormData): Promise<AuthState> {
   const { t } = await getI18n();
@@ -39,7 +44,7 @@ export async function login(_prev: AuthState, formData: FormData): Promise<AuthS
   let role: string | undefined;
   try {
     const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
-    const ok = user?.passwordHash ? await verifyPassword(password, user.passwordHash) : false;
+    const ok = await verifyPassword(password, user?.passwordHash ?? DUMMY_HASH);
     if (!user || !ok) return { error: t.auth.invalid };
 
     await createSession(user.id);
@@ -61,6 +66,10 @@ const signupSchema = z.object({
 
 export async function signup(_prev: AuthState, formData: FormData): Promise<AuthState> {
   const { t } = await getI18n();
+  // Account-creation spam guard: 10 signups / hour per IP.
+  if (!rateLimit(`signup:${await clientKey("signup")}`, 10, 60 * 60 * 1000)) {
+    return { error: t.auth.rateLimited };
+  }
   if (formData.get("consent") !== "on") return { error: t.auth.needConsent };
 
   const parsed = signupSchema.safeParse(Object.fromEntries(formData));

@@ -40,7 +40,9 @@ export async function createSession(userId: string) {
   (await cookies()).set(COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.COOKIE_SECURE === "true",
+    // Secure by default in production (Vercel is HTTPS-only); COOKIE_SECURE=true
+    // can force it on elsewhere, =false only for plain-http local dev.
+    secure: process.env.COOKIE_SECURE ? process.env.COOKIE_SECURE === "true" : process.env.NODE_ENV === "production",
     path: "/",
     expires: expiresAt,
   });

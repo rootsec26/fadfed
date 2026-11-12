@@ -1,7 +1,7 @@
 "use server";
 
 import { randomBytes } from "node:crypto";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
@@ -9,6 +9,7 @@ import { appointments, patients, services } from "@/db/schema";
 import { canPatientModify, loadAppointment, notifyAppointment } from "@/lib/appointments";
 import { getCurrentUser, getOrCreatePatientForUser } from "@/lib/auth";
 import { getI18n } from "@/lib/i18n";
+import { clientKey, rateLimit } from "@/lib/rate-limit";
 import { createMeetingLink } from "@/lib/integrations/video";
 import { createPaymentSession } from "@/lib/integrations/payments";
 import { getSettings } from "@/lib/settings";
@@ -36,6 +37,11 @@ const isUniqueViolation = (e: unknown) =>
 
 export async function createBooking(input: BookingInput): Promise<BookingResult> {
   const { t, lang } = await getI18n();
+  // Booking spam guard: 20 bookings / day per IP (each one writes rows and
+  // fires notifications, so it needs a ceiling even though slots are limited).
+  if (!rateLimit(`booking:${await clientKey("booking")}`, 20, 24 * 60 * 60 * 1000)) {
+    return { ok: false, error: t.booking.errors.unavailable };
+  }
   const parsed = bookingSchema.safeParse(input);
   if (!parsed.success) {
     const consent = parsed.error.issues.some((i) => i.path[0] === "consent");
@@ -103,6 +109,7 @@ export async function createBooking(input: BookingInput): Promise<BookingResult>
     throw e;
   }
 
+  revalidateTag("slots", "max");
   revalidatePath("/account");
   revalidatePath("/dashboard");
   return { ok: true, token };
@@ -119,6 +126,7 @@ export async function cancelAppointment(token: string) {
     .set({ status: "cancelled", cancelledBy: "patient" })
     .where(eq(appointments.id, full.appointment.id));
   await notifyAppointment({ ...full, appointment: { ...full.appointment, status: "cancelled" } }, "cancelled", lang);
+  revalidateTag("slots", "max");
   revalidatePath(`/appointments/${token}`);
   revalidatePath("/account");
   revalidatePath("/dashboard", "layout");
@@ -145,6 +153,7 @@ export async function rescheduleAppointment(token: string, date: string, time: s
   }
   const updated = await loadAppointment({ token });
   if (updated) await notifyAppointment(updated, "rescheduled", lang);
+  revalidateTag("slots", "max");
   revalidatePath(`/appointments/${token}`);
   revalidatePath("/account");
   revalidatePath("/dashboard", "layout");

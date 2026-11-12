@@ -13,10 +13,9 @@ const globalForDb = globalThis as typeof globalThis & {
 
 // postgres.js is used (instead of node-postgres) because Supabase's
 // Transaction Pooler (port 6543) requires `prepare: false` — prepared
-// statements are not supported in transaction mode. On Vercel each
-// serverless instance gets a single connection; locally we keep a small
-// pool and cache it on globalThis so `next dev` hot-reloads don't leak
-// connections.
+// statements are not supported in transaction mode. Keep the pool small for
+// serverless instances and cache it on globalThis so `next dev` hot-reloads
+// don't leak connections.
 const isServerless = !!process.env.VERCEL || process.env.NODE_ENV === "production";
 
 export const sqlClient =
@@ -24,14 +23,11 @@ export const sqlClient =
   postgres(databaseUrl, {
     ssl: "require",
     prepare: false,
-    max: isServerless ? 1 : 10,
+    max: 3,
     idle_timeout: isServerless ? 20 : 60,
     connect_timeout: 10,
-    // Fail fast instead of hanging the request when the pooler stalls:
-    // queue_timeout bounds time waiting for a free connection,
-    // query_timeout bounds a running query.
-    queue_timeout: 15,
-    query_timeout: 30,
+    // Supavisor transaction mode can drop pipelined query responses.
+    max_pipeline: 1,
     // The pooler drops idle TCP connections; keepAlive avoids handing out
     // dead sockets and makes checkout fail fast instead of hanging.
     keep_alive: 60,
