@@ -111,7 +111,7 @@ export default async function AdminPatientPage({ params }: { params: Promise<{ i
                 <p className="whitespace-pre-wrap leading-7">{n.content}</p>
                 <div className="mt-2 flex items-center justify-between text-xs text-ink-soft">
                   <span>{fmt(n.createdAt)}</span>
-                  <form action={deleteSessionNote.bind(null, n.id, id)}><button aria-label="مسح" className="cursor-pointer text-rose-600"><Trash2 className="size-4" /></button></form>
+                  <form action={deleteSessionNote.bind(null, n.id, id)}><button aria-label="مسح" className="inline-flex size-11 cursor-pointer items-center justify-center rounded-full text-rose-600 transition hover:bg-rose-50 lg:size-8"><Trash2 className="size-4" /></button></form>
                 </div>
               </div>
             ))}

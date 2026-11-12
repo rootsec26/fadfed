@@ -106,6 +106,25 @@ html[dir="rtl"] body {
   line-height: 1.8;
 }
 
+/* Mobile usability for the patient area / doctor dashboard.
+   DashboardShell adds `.dash-scope` to its root. Below the lg breakpoint:
+   - nothing renders smaller than 14px (text-xs and tiny arbitrary sizes are raised)
+   - form controls stay at 16px so iOS doesn't auto-zoom on focus */
+@media (max-width: 1023px) {
+  .dash-scope .text-xs,
+  .dash-scope .text-\[10px\],
+  .dash-scope .text-\[11px\],
+  .dash-scope .text-\[12px\] {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+  .dash-scope input:not([type="checkbox"]):not([type="radio"]),
+  .dash-scope select,
+  .dash-scope textarea {
+    font-size: 16px;
+  }
+}
+
 ::selection {
   background: var(--color-brand-200);
 }

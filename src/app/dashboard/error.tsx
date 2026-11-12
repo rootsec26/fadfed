@@ -12,7 +12,7 @@ export default function AdminError({ error, reset }: { error: Error; reset: () =
       <Alert tone="error">حصل خطأ غير متوقع. جرّب تاني، ولو المشكلة مستمرة كلم الدعم الفني.</Alert>
       <button
         onClick={reset}
-        className="cursor-pointer rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700"
+        className="min-h-11 cursor-pointer rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700"
       >
         إعادة المحاولة
       </button>

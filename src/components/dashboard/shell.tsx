@@ -31,7 +31,7 @@ export function DashboardShell({
 }) {
   const dir = lang === "ar" ? "rtl" : "ltr";
   return (
-    <div dir={dir} lang={lang} className="min-h-screen bg-sand-50">
+    <div dir={dir} lang={lang} className="dash-scope min-h-screen bg-sand-50">
       {showEmergency && <EmergencyBanner />}
       <header className="border-b border-sand-200 bg-white">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4">
@@ -42,11 +42,11 @@ export function DashboardShell({
           <div className="flex items-center gap-2">
             <LangToggle />
             <span className="hidden text-sm text-ink-soft sm:inline">{userName}</span>
-            <Link href="/home" className="rounded-full px-3 py-1.5 text-sm font-semibold text-ink-soft hover:bg-sand-100">
+            <Link href="/home" className="inline-flex min-h-11 items-center rounded-full px-3 py-1.5 text-sm font-semibold text-ink-soft hover:bg-sand-100 lg:min-h-0">
               {lang === "ar" ? "الموقع" : "Website"}
             </Link>
             <form action={logout}>
-              <button className="inline-flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold text-rose-600 hover:bg-rose-50">
+              <button className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold text-rose-600 hover:bg-rose-50 lg:min-h-0">
                 <LogOut className="size-4" /> {lang === "ar" ? "خروج" : "Log out"}
               </button>
             </form>

@@ -10,7 +10,7 @@ import type { adminVideosT } from "@/lib/i18n/admin-videos";
 type T = ReturnType<typeof adminVideosT>;
 
 const iconBtn =
-  "grid size-8 cursor-pointer place-items-center rounded-full text-ink-soft transition hover:bg-sand-100 disabled:cursor-not-allowed disabled:opacity-40";
+  "grid size-11 cursor-pointer place-items-center rounded-full text-ink-soft transition hover:bg-sand-100 disabled:cursor-not-allowed disabled:opacity-40 lg:size-8";
 
 /** Row actions for the admin videos table: publish/feature toggles, reorder, delete. */
 export function VideoRowActions({
@@ -87,14 +87,14 @@ export function VideoRowActions({
               setConfirming(false);
               run(() => deleteVideo(id), t.deleted);
             }}
-            className="cursor-pointer rounded-full bg-rose-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-rose-700"
+            className="min-h-11 cursor-pointer rounded-full bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-700"
           >
             {t.confirmDelete}
           </button>
           <button
             type="button"
             onClick={() => setConfirming(false)}
-            className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-bold text-ink-soft hover:bg-sand-100"
+            className="min-h-11 cursor-pointer rounded-full px-4 py-2 text-xs font-bold text-ink-soft hover:bg-sand-100"
           >
             ✕
           </button>

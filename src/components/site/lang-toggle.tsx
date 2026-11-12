@@ -9,7 +9,7 @@ export async function LangToggle() {
       <input type="hidden" name="lang" value={lang === "ar" ? "en" : "ar"} />
       <button
         type="submit"
-        className="inline-flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold text-ink-soft transition hover:bg-sand-100"
+        className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold text-ink-soft transition hover:bg-sand-100 lg:min-h-0"
       >
         <Languages className="size-4" />
         {t.nav.switchLang}

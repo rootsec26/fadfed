@@ -18,8 +18,9 @@ const variants: Record<Variant, string> = {
   whatsapp: "bg-[#25D366] text-white hover:bg-[#1fb957]",
 };
 const sizes: Record<Size, string> = {
-  sm: "px-3.5 py-1.5 text-sm",
-  md: "px-5 py-2.5 text-sm",
+  // min-h-11 keeps touch targets >= 44px on mobile/tablet; lg restores compact sizing.
+  sm: "min-h-11 px-3.5 py-1.5 text-sm lg:min-h-0",
+  md: "min-h-11 px-5 py-2.5 text-sm lg:min-h-0",
   lg: "px-7 py-3.5 text-base",
 };
 

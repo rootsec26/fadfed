@@ -140,11 +140,11 @@ export function SessionRowActions({
               setConfirming(null);
               run(() => endLiveSession(id), a.endedOk);
             }}
-            className="cursor-pointer rounded-full bg-rose-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-rose-700"
+            className="min-h-11 cursor-pointer rounded-full bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-700"
           >
             {a.confirmEnd}
           </button>
-          <button type="button" onClick={() => setConfirming(null)} className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-bold text-ink-soft hover:bg-sand-100">
+          <button type="button" onClick={() => setConfirming(null)} className="min-h-11 cursor-pointer rounded-full px-4 py-2 text-xs font-bold text-ink-soft hover:bg-sand-100">
             ✕
           </button>
         </span>
@@ -162,11 +162,11 @@ export function SessionRowActions({
               setConfirming(null);
               run(() => cancelLiveSession(id), a.cancelledOk);
             }}
-            className="cursor-pointer rounded-full bg-rose-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-rose-700"
+            className="min-h-11 cursor-pointer rounded-full bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-700"
           >
             {a.confirmCancel}
           </button>
-          <button type="button" onClick={() => setConfirming(null)} className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-bold text-ink-soft hover:bg-sand-100">
+          <button type="button" onClick={() => setConfirming(null)} className="min-h-11 cursor-pointer rounded-full px-4 py-2 text-xs font-bold text-ink-soft hover:bg-sand-100">
             ✕
           </button>
         </span>

@@ -48,7 +48,7 @@ export default async function AdminAppointmentPage({ params }: { params: Promise
             </div>
             <p className="text-sm text-ink-soft" dir="ltr">{patient.email} · {patient.phone}</p>
             {rows.map(([k, v]) => (
-              <div key={k} className="flex justify-between gap-4 border-t border-sand-100 pt-3 text-sm"><span className="text-ink-soft">{k}</span><span className="font-semibold">{v}</span></div>
+              <div key={k} className="flex flex-wrap justify-between gap-x-4 gap-y-1 border-t border-sand-100 pt-3 text-sm"><span className="text-ink-soft">{k}</span><span className="font-semibold">{v}</span></div>
             ))}
             {a.patientNote && <Alert>{a.patientNote}</Alert>}
             {a.meetingUrl && a.sessionType === "online" && (

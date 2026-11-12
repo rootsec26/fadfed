@@ -167,7 +167,7 @@ export default async function AdminVideosPage({
                     <div className="flex items-center justify-end gap-1">
                       <Link
                         href={`/dashboard/videos/${v.id}/edit`}
-                        className="rounded-full px-3 py-1.5 text-xs font-bold text-brand-700 hover:bg-brand-50"
+                        className="inline-flex min-h-11 items-center rounded-full px-3.5 py-1.5 text-xs font-bold text-brand-700 hover:bg-brand-50 lg:min-h-0"
                       >
                         {lang === "ar" ? "تعديل" : "Edit"}
                       </Link>

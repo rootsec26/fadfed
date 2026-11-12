@@ -43,8 +43,8 @@ export default async function AdminPatients({ searchParams }: { searchParams: Pr
       <TabNav active="patients" patientsLabel="المرضى" sessionsLabel={t.live.admin.tab} />
       <PageTitle title="المرضى" subtitle="بيانات حساسة – الوصول مقصور على الدكتور بس." />
       <form className="mb-5 flex max-w-md gap-2">
-        <Input name="q" defaultValue={q} placeholder="دوّر بالاسم أو الإيميل أو الموبايل" />
-        <button className={btn("primary", "md")}>دوّر</button>
+        <Input name="q" defaultValue={q} placeholder="دوّر بالاسم أو الإيميل أو الموبايل" className="min-w-0 flex-1" />
+        <button className={btn("primary", "md", "shrink-0")}>دوّر</button>
       </form>
       <div className="grid gap-3 md:grid-cols-2">
         {rows.length === 0 && <Card className="text-sm text-ink-soft">مفيش نتايج.</Card>}

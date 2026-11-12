@@ -54,10 +54,10 @@ export default async function AdminCalendar() {
                         {r.breakStart && ` (راحة ${formatTime(r.breakStart)}–${formatTime(r.breakEnd!)})`}
                       </span>
                       <form action={toggleAvailabilityRule.bind(null, r.id, !r.active)}>
-                        <button className="cursor-pointer rounded-full bg-white px-2 py-0.5 font-semibold text-brand-700">{r.active ? "وقّف" : "شغّل"}</button>
+                        <button className="min-h-9 cursor-pointer rounded-full bg-white px-2.5 py-1 font-semibold text-brand-700">{r.active ? "وقّف" : "شغّل"}</button>
                       </form>
                       <form action={deleteAvailabilityRule.bind(null, r.id)}>
-                        <button aria-label="مسح" className="grid size-6 cursor-pointer place-items-center rounded-full bg-white text-rose-600"><Trash2 className="size-3.5" /></button>
+                        <button aria-label="مسح" className="grid size-8 cursor-pointer place-items-center rounded-full bg-white text-rose-600"><Trash2 className="size-4" /></button>
                       </form>
                     </span>
                   ))}
@@ -91,7 +91,7 @@ export default async function AdminCalendar() {
                 <li key={d.id} className="flex items-center justify-between rounded-2xl bg-sand-100 px-4 py-2 text-sm">
                   <span>{formatDate(d.date, "ar")}{d.reason && <span className="text-ink-soft"> · {d.reason}</span>}</span>
                   <form action={deleteDayOff.bind(null, d.id)}>
-                    <button aria-label="مسح" className="cursor-pointer text-rose-600"><Trash2 className="size-4" /></button>
+                    <button aria-label="مسح" className="inline-flex size-11 cursor-pointer items-center justify-center rounded-full text-rose-600 transition hover:bg-rose-50 lg:size-8"><Trash2 className="size-4" /></button>
                   </form>
                 </li>
               ))}
