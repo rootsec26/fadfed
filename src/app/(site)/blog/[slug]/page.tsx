@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { and, eq } from "drizzle-orm";
-import { db } from "@/db";
-import { articles } from "@/db/schema";
+import { getPublishedArticle } from "@/lib/catalog";
 import { ArticleBody } from "@/components/site/article-body";
 import { Alert, Badge, btn } from "@/components/ui";
 import { getI18n, pick } from "@/lib/i18n";
@@ -10,14 +8,7 @@ import { formatDate } from "@/lib/time";
 
 type Props = { params: Promise<{ slug: string }> };
 
-async function getArticle(slug: string) {
-  const [a] = await db
-    .select()
-    .from(articles)
-    .where(and(eq(articles.slug, decodeURIComponent(slug)), eq(articles.published, true)))
-    .limit(1);
-  return a;
-}
+const getArticle = (slug: string) => getPublishedArticle(decodeURIComponent(slug));
 
 export async function generateMetadata({ params }: Props) {
   const a = await getArticle((await params).slug);

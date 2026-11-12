@@ -1,6 +1,4 @@
-import { asc, eq } from "drizzle-orm";
-import { db } from "@/db";
-import { services } from "@/db/schema";
+import { listActiveServices } from "@/lib/catalog";
 import { BookingWizard } from "@/components/booking/booking-wizard";
 import { PageHero } from "@/components/site/page-hero";
 import { Card } from "@/components/ui";
@@ -12,7 +10,7 @@ export const metadata = { title: "احجز جلستك | Book" };
 
 export default async function BookPage({ searchParams }: { searchParams: Promise<{ service?: string }> }) {
   const [{ t, lang }, settings, user, sp] = await Promise.all([getI18n(), getSettings(), getCurrentUser(), searchParams]);
-  const list = await db.select().from(services).where(eq(services.active, true)).orderBy(asc(services.sortOrder));
+  const list = await listActiveServices();
   const wanted = Number(sp.service);
 
   return (

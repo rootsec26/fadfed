@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { and, asc, desc, eq, gt, lt, or, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { videos } from "@/db/schema";
@@ -46,6 +46,7 @@ export type ActionResult = { ok: true; id?: number } | { ok: false; error: strin
 const str = (fd: FormData, k: string) => String(fd.get(k) ?? "").trim();
 const bool = (fd: FormData, k: string) => fd.get(k) === "on" || fd.get(k) === "true";
 const refresh = () => {
+  revalidateTag("videos", "max");
   revalidatePath("/");
   revalidatePath("/dashboard/videos");
   revalidatePath("/dashboard");

@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -48,6 +48,7 @@ export async function setAppointmentStatus(id: string, status: AppointmentStatus
     .where(eq(appointments.id, id));
   const full = await loadAppointment({ id });
   if (full && (status === "confirmed" || status === "cancelled")) await notifyAppointment(full, status);
+  revalidateTag("slots", "max");
   refresh("/dashboard", "/dashboard/appointments", `/dashboard/appointments/${id}`, "/account");
 }
 
@@ -74,6 +75,7 @@ export async function rescheduleByDoctor(id: string, date: string, time: string)
   }
   const updated = await loadAppointment({ id });
   if (updated) await notifyAppointment(updated, "rescheduled");
+  revalidateTag("slots", "max");
   refresh("/dashboard", "/dashboard/appointments", `/dashboard/appointments/${id}`, "/account");
   return { ok: true };
 }
@@ -102,18 +104,21 @@ export async function addAvailabilityRule(fd: FormData) {
     breakStart: hasBreak ? d.breakStart : null,
     breakEnd: hasBreak ? d.breakEnd : null,
   });
+  revalidateTag("slots", "max");
   refresh("/dashboard/calendar", "/contact");
 }
 
 export async function toggleAvailabilityRule(id: number, active: boolean) {
   await requireDoctor();
   await db.update(availabilityRules).set({ active }).where(eq(availabilityRules.id, id));
+  revalidateTag("slots", "max");
   refresh("/dashboard/calendar", "/contact");
 }
 
 export async function deleteAvailabilityRule(id: number) {
   await requireDoctor();
   await db.delete(availabilityRules).where(eq(availabilityRules.id, id));
+  revalidateTag("slots", "max");
   refresh("/dashboard/calendar", "/contact");
 }
 
@@ -122,12 +127,14 @@ export async function addDayOff(fd: FormData) {
   const date = str(fd, "date");
   if (!isValidDate(date)) return;
   await db.insert(daysOff).values({ date, reason: optional(fd, "reason") }).onConflictDoNothing();
+  revalidateTag("slots", "max");
   refresh("/dashboard/calendar");
 }
 
 export async function deleteDayOff(id: number) {
   await requireDoctor();
   await db.delete(daysOff).where(eq(daysOff.id, id));
+  revalidateTag("slots", "max");
   refresh("/dashboard/calendar");
 }
 
@@ -195,6 +202,7 @@ export async function saveService(fd: FormData) {
   const id = Number(fd.get("id"));
   if (id) await db.update(services).set(values).where(eq(services.id, id));
   else await db.insert(services).values(values).onConflictDoNothing();
+  revalidateTag("catalog", "max");
   refresh("/dashboard/services", "/services", "/book", "/home");
 }
 
@@ -224,12 +232,14 @@ export async function saveArticle(fd: FormData) {
   const id = Number(fd.get("id"));
   if (id) await db.update(articles).set(values).where(eq(articles.id, id));
   else await db.insert(articles).values(values).onConflictDoNothing();
+  revalidateTag("catalog", "max");
   refresh("/dashboard/articles", "/blog");
 }
 
 export async function deleteArticle(id: number) {
   await requireDoctor();
   await db.delete(articles).where(eq(articles.id, id));
+  revalidateTag("catalog", "max");
   refresh("/dashboard/articles", "/blog");
 }
 
@@ -249,12 +259,14 @@ export async function saveTestimonial(fd: FormData) {
   const id = Number(fd.get("id"));
   if (id) await db.update(testimonials).set(values).where(eq(testimonials.id, id));
   else await db.insert(testimonials).values(values);
+  revalidateTag("catalog", "max");
   refresh("/dashboard/testimonials", "/home");
 }
 
 export async function deleteTestimonial(id: number) {
   await requireDoctor();
   await db.delete(testimonials).where(eq(testimonials.id, id));
+  revalidateTag("catalog", "max");
   refresh("/dashboard/testimonials", "/home");
 }
 
@@ -287,6 +299,7 @@ export async function saveSettings(fd: FormData) {
       notifyDoctor: bool(fd, "notifyDoctor"),
     })
     .where(eq(clinicSettings.id, 1));
+  revalidateTag("settings", "max");
   revalidatePath("/home", "layout");
   redirect("/dashboard/settings?saved=1");
 }

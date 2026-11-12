@@ -1,9 +1,7 @@
-import { asc, eq } from "drizzle-orm";
-import { db } from "@/db";
-import { services } from "@/db/schema";
 import { PageHero } from "@/components/site/page-hero";
 import { ServiceCard } from "@/components/site/service-card";
 import { Alert } from "@/components/ui";
+import { listActiveServices } from "@/lib/catalog";
 import { getI18n, pick } from "@/lib/i18n";
 import { getSettings } from "@/lib/settings";
 
@@ -11,7 +9,7 @@ export const metadata = { title: "الخدمات | Services" };
 
 export default async function ServicesPage() {
   const [{ t, lang }, s] = await Promise.all([getI18n(), getSettings()]);
-  const list = await db.select().from(services).where(eq(services.active, true)).orderBy(asc(services.sortOrder));
+  const list = await listActiveServices();
   return (
     <>
       <PageHero title={t.servicesPage.title} subtitle={t.servicesPage.subtitle} />

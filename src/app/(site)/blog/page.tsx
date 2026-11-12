@@ -1,9 +1,7 @@
 import Link from "next/link";
-import { desc, eq } from "drizzle-orm";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { db } from "@/db";
-import { articles } from "@/db/schema";
 import { PageHero } from "@/components/site/page-hero";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { listPublishedArticles } from "@/lib/catalog";
 import { Badge, Card } from "@/components/ui";
 import { getI18n, pick } from "@/lib/i18n";
 import { formatDate } from "@/lib/time";
@@ -12,7 +10,7 @@ export const metadata = { title: "المقالات | Articles" };
 
 export default async function BlogPage() {
   const { t, lang } = await getI18n();
-  const list = await db.select().from(articles).where(eq(articles.published, true)).orderBy(desc(articles.publishedAt));
+  const list = await listPublishedArticles();
   const Arrow = lang === "ar" ? ArrowLeft : ArrowRight;
   return (
     <>
