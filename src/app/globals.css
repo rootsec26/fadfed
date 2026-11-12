@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+/* Design tokens – single source of truth for the whole site.
+   Palette: calm teal primary, sage, warm sand, soft terracotta accent. */
+@theme {
+  --font-sans: "Cairo", "Tajawal", system-ui, sans-serif;
+
+  /* primary – calm teal green (#2F6F6B) */
+  --color-brand-50: #eff6f4;
+  --color-brand-100: #e3efec; /* primary-soft */
+  --color-brand-200: #c2deda;
+  --color-brand-300: #93c1ba;
+  --color-brand-400: #5e9c95;
+  --color-brand-500: #44837c;
+  --color-brand-600: #2f6f6b; /* primary */
+  --color-brand-700: #1f4e4b; /* primary-dark (hover / emphasis) */
+  --color-brand-800: #1a403d;
+  --color-brand-900: #143330;
+
+  /* sage – soft grey-green */
+  --color-sage-50: #f3f7f4;
+  --color-sage-100: #e4efe7;
+  --color-sage-200: #c9dccf;
+  --color-sage-300: #a8c3b5; /* sage */
+  --color-sage-500: #6e947f;
+  --color-sage-700: #476b52;
+
+  /* sand – warm cream background + hairline borders */
+  --color-sand-50: #faf7f2; /* background */
+  --color-sand-100: #f1ebe1;
+  --color-sand-200: #e6e1d8; /* border */
+  --color-sand-300: #d6cdbc;
+  --color-sand-700: #5b6b70; /* muted text on sand */
+
+  /* ink – text */
+  --color-ink: #23343a;
+  --color-ink-soft: #5b6b70; /* text-muted */
+  --color-surface: #ffffff;
+  --color-border: #e6e1d8;
+
+  /* accent – warm terracotta, small details only */
+  --color-accent: #d98b6a;
+  --color-accent-soft: #f6e3d8;
+
+  /* status – calm, desaturated */
+  --color-success: #4c9a7a;
+  --color-warning: #d9a441;
+  --color-error: #c2574b;
+
+  /* rose – softened error scale (danger buttons, alerts, delete actions) */
+  --color-rose-50: #faf0ee;
+  --color-rose-100: #f4dfdb;
+  --color-rose-200: #e7c4bc;
+  --color-rose-300: #d6a295;
+  --color-rose-600: #b84e42;
+  --color-rose-700: #9a3f36;
+  --color-rose-800: #7e352c;
+  --color-rose-900: #662a23;
+
+  /* amber – softened warning scale */
+  --color-amber-50: #fbf4e4;
+  --color-amber-100: #f5e7c6;
+  --color-amber-200: #ecd3a0;
+  --color-amber-400: #d9a441;
+  --color-amber-600: #a87f2e;
+  --color-amber-800: #6e5216;
+  --color-amber-900: #5c4312;
+
+  --animate-fade-up: fade-up 0.7s ease-out both;
+  --animate-fade-in: fade-in 0.6s ease-out both;
+  --animate-float: float 8s ease-in-out infinite;
+  --animate-breath: breath 7s ease-in-out infinite;
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  /* Breathing fallback — animates the `scale` property so it composes with translate. */
+  @keyframes breath {
+    0%, 100% { scale: 0.92; }
+    50% { scale: 1.06; }
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-sand-50);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Comfortable line-height for Arabic text */
+html[dir="rtl"] body {
+  line-height: 1.8;
+}
+
+::selection {
+  background: var(--color-brand-200);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

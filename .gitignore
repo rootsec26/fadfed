@@ -1,0 +1,45 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# next.js
+/.next/
+/out/
+/dist/
+/build
+
+# production
+/coverage
+.vercel
+
+# media / temp / archives — never commit test assets
+*.mp4
+*.mov
+*.webm
+*.zip
+*.bak
+*.log
+/backup*
+/Backups*
+/screenshots/
+/temp/
+/tmp/
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files — never commit secrets (.env.example is the only allowed one)
+.env*
+!.env.example
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
