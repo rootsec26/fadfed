@@ -29,6 +29,18 @@ import { addDays, todayInTz, toMin, fromMin, weekdayOf } from "@/lib/time";
  */
 
 let seeding: Promise<void> | null = null;
+// The admin-account check is memoized per instance: getSettings() runs on
+// every public page (footer), and re-running SELECT+UPDATE on every request
+// would serialize all queries through the single serverless connection and
+// contend on the same row lock across instances.
+let adminCheck: Promise<void> | null = null;
+
+function ensureAdminOnce() {
+  adminCheck ??= ensureAdminAccount().catch((e) => {
+    console.error("[seed] admin account failed", e);
+  });
+  return adminCheck;
+}
 
 export function ensureSeed() {
   // Never touch the database during `next build` — prerendering may call
@@ -37,7 +49,7 @@ export function ensureSeed() {
   if (process.env.NEXT_PHASE === "phase-production-build") return Promise.resolve();
   // The admin account is seeded whenever ADMIN_EMAIL/ADMIN_PASSWORD are set,
   // even when demo data seeding is disabled.
-  const admin = ensureAdminAccount().catch((e) => console.error("[seed] admin account failed", e));
+  const admin = ensureAdminOnce();
   // Demo data never auto-runs in production: it requires AUTO_SEED=true
   // explicitly there. Outside production it stays on by default.
   const autoSeed =

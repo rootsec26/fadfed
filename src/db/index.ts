@@ -22,17 +22,24 @@ const isServerless = !!process.env.VERCEL || process.env.NODE_ENV === "productio
 export const sqlClient =
   globalForDb.__postgresClient ??
   postgres(databaseUrl, {
+    ssl: "require",
     prepare: false,
     max: isServerless ? 1 : 10,
     idle_timeout: isServerless ? 20 : 60,
     connect_timeout: 10,
+    // Fail fast instead of hanging the request when the pooler stalls:
+    // queue_timeout bounds time waiting for a free connection,
+    // query_timeout bounds a running query.
+    queue_timeout: 15,
+    query_timeout: 30,
     // The pooler drops idle TCP connections; keepAlive avoids handing out
     // dead sockets and makes checkout fail fast instead of hanging.
     keep_alive: 60,
   });
 
-if (process.env.NODE_ENV !== "production") {
-  globalForDb.__postgresClient = sqlClient;
-}
+// Cache on globalThis in every environment: serverless instances reuse the
+// module anyway, and this keeps `next dev` hot-reloads from leaking
+// connections too.
+globalForDb.__postgresClient = sqlClient;
 
 export const db = drizzle(sqlClient);
