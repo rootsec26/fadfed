@@ -14,7 +14,7 @@ import {
   testimonials,
   users,
 } from "@/db/schema";
-import { hashPassword } from "@/lib/auth";
+import { hashPassword, verifyPassword } from "@/lib/auth";
 import { doctorProfile } from "@/lib/profile";
 import { addDays, todayInTz, toMin, fromMin, weekdayOf } from "@/lib/time";
 
@@ -269,7 +269,9 @@ async function seed() {
 /**
  * Ensure the single admin (doctor) account exists when ADMIN_EMAIL and
  * ADMIN_PASSWORD are set. Idempotent: creates the user on first run and
- * updates the password hash on later runs so rotating the env var works.
+ * updates the password hash ONLY when it no longer matches the env value —
+ * so cold starts don't write to the DB and a password changed outside the
+ * env var isn't silently reverted on every instance spin-up.
  * Never hard-codes credentials.
  */
 async function ensureAdminAccount() {
@@ -280,16 +282,25 @@ async function ensureAdminAccount() {
     console.warn("[seed] ADMIN_PASSWORD is too short (min 8) — admin account not created");
     return;
   }
-  const passwordHash = await hashPassword(password);
-  const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1);
+  const [existing] = await db
+    .select({ id: users.id, passwordHash: users.passwordHash })
+    .from(users)
+    .where(eq(users.email, email))
+    .limit(1);
   if (existing) {
-    await db.update(users).set({ role: "doctor", passwordHash }).where(eq(users.id, existing.id));
+    const matches = existing.passwordHash ? await verifyPassword(password, existing.passwordHash) : false;
+    if (!matches) {
+      await db
+        .update(users)
+        .set({ role: "doctor", passwordHash: await hashPassword(password) })
+        .where(eq(users.id, existing.id));
+    }
   } else {
     await db.insert(users).values({
       email,
       name: doctorProfile.nameAr,
       role: "doctor",
-      passwordHash,
+      passwordHash: await hashPassword(password),
     });
     console.log(`[seed] admin account ready: ${email}`);
   }

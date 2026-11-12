@@ -1,8 +1,8 @@
 import { cache } from "react";
 import { eq } from "drizzle-orm";
+import { unstable_cache } from "next/cache";
 import { db } from "@/db";
 import { clinicSettings } from "@/db/schema";
-import { ensureSeed } from "@/db/seed";
 import { doctorProfile } from "@/lib/profile";
 
 /**
@@ -40,14 +40,25 @@ export const DEFAULT_SETTINGS = {
 } as const;
 
 /**
- * Single-row clinic settings (id = 1). Also triggers first-run demo seeding.
+ * Single-row clinic settings (id = 1), cached across requests (settings
+ * change rarely; saveSettings() revalidates the "settings" tag).
  * Never returns null/undefined: if the row is missing it is created from
  * DEFAULT_SETTINGS, and DEFAULT_SETTINGS itself is the last-resort fallback.
+ * Seeding/admin provisioning runs in instrumentation.ts at startup — never
+ * in the request path.
  */
+const fetchSettingsRow = unstable_cache(
+  async () => {
+    const [row] = await db.select().from(clinicSettings).where(eq(clinicSettings.id, 1)).limit(1);
+    return row ?? null;
+  },
+  ["clinic-settings"],
+  { revalidate: 60, tags: ["settings"] },
+);
+
 export const getSettings = cache(async () => {
   try {
-    await ensureSeed();
-    const [row] = await db.select().from(clinicSettings).where(eq(clinicSettings.id, 1)).limit(1);
+    const row = await fetchSettingsRow();
     if (row) return row;
 
     // Self-heal: create the singleton row so the app works even when the
